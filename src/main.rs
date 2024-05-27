@@ -36,7 +36,10 @@ fn main() {
         }
     });
 
+    let start = Instant::now();
     let changed_files = get_changed_files();
+    let duration = start.elapsed();
+    println!("Getting changed files done in: {:?}", duration);
 
     let mut filtered_files: Vec<String> = Vec::new();
 
@@ -102,10 +105,7 @@ fn create_patterns_filters(arg: &str) -> Vec<PatternFilter> {
 }
 
 fn get_changed_files() -> Vec<String> {
-    let start = Instant::now();
     let repository = Repository::open(".").expect("Failed to open repository");
-    let duration = start.elapsed();
-    println!("Opening repository done in: {:?}", duration);
 
     let head = repository.head().expect("Failed to get HEAD");
     let head_commit = head.peel_to_commit().expect("Failed to peel HEAD to commit");
@@ -122,7 +122,6 @@ fn get_changed_files() -> Vec<String> {
     let base_ref = repository.find_reference(&base_ref_string).expect("Failed to find default branch");
     let base_commit = base_ref.peel_to_commit().expect("Failed to peel default branch to commit");
 
-    let start = Instant::now();
     let diff = repository.diff_tree_to_tree(
         Some(&base_commit.tree().expect("Failed to get base tree")),
         Some(&head_commit.tree().expect("Failed to get HEAD tree")),
@@ -141,8 +140,6 @@ fn get_changed_files() -> Vec<String> {
         None,
         None,
     ).expect("Error while iterating over diff");
-    let duration = start.elapsed();
-    println!("Getting changed files done in: {:?}", duration);
 
     changed_files
 }
