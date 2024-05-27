@@ -6,7 +6,6 @@ on:
       tag:
         description: 'Tag to release'
         required: true
-        default: 'v0.1.0-alpha'
 
 jobs:
   build-artifacts:
