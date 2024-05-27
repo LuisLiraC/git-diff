@@ -1,0 +1,52 @@
+name: Release Binary
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-artifacts:
+    runs-on: ubuntu-latest
+    name: Build Artifacts
+    env:
+      binary_name: git-diff
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pkg-config and libssl-dev
+        run: sudo apt-get install pkg-config libssl-dev
+
+      - name: Build
+        run: cargo build --release
+
+      - name: Create Archive Folder
+        run: mkdir ${{ runner.os }}
+
+      - name: Copy Artifact
+        run: cp target/release/${{ env.binary_name }} ${{ runner.os }}
+
+      - name: Create Tar Archive
+        run: tar -czf ${{ runner.os }}.tgz ${{ runner.os }}
+
+      - name: Store Archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ runner.os }}
+          path: ${{ runner.os }}.tgz
+
+  create-release:
+    needs: [build-artifacts]
+    runs-on: ubuntu-latest
+    name: Create Release
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "Linux/Linux.tgz"
+          tag: v0.1.14-alpha
