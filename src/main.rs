@@ -58,7 +58,7 @@ fn main() {
         .arg("-c")
         .arg(format!("echo \"DIFF_FILES={:?}\" >> $GITHUB_OUTPUT", filtered_files))
         .output()
-        .expect("Failed to execute DIFF command");
+        .expect("Failed to execute DIFF_FILES command");
 
     Command::new("sh")
         .arg("-c")
@@ -106,11 +106,11 @@ fn get_changed_files() -> Vec<String> {
         .arg("-c")
         .arg(format!("git fetch origin {}", base_ref_env))
         .output()
-        .expect("Failed to execute DIFF_COUNT command");
+        .expect("Failed to execute fetch branch command");
 
     let base_ref_string = format!("refs/remotes/origin/{}", base_ref_env);
-    let base_ref = repository.find_reference(&base_ref_string).expect("Failed to find main branch");
-    let base_commit = base_ref.peel_to_commit().expect("Failed to peel main branch to commit");
+    let base_ref = repository.find_reference(&base_ref_string).expect("Failed to find default branch");
+    let base_commit = base_ref.peel_to_commit().expect("Failed to peel default branch to commit");
 
     let diff = repository.diff_tree_to_tree(
         Some(&base_commit.tree().expect("Failed to get base tree")),
