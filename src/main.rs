@@ -2,6 +2,7 @@ use git2::Repository;
 use std::env;
 use glob::Pattern;
 use std::process::Command;
+use std::time::Instant;
 
 #[derive(Clone)]
 struct PatternFilter {
@@ -35,14 +36,21 @@ fn main() {
         }
     });
 
+    let start = Instant::now();
     let changed_files = get_changed_files();
+    let duration = start.elapsed();
+    println!("Getting changed files done in: {:?}", duration);
 
     let mut filtered_files: Vec<String> = Vec::new();
 
+    let start = Instant::now();
     for pattern in include_patterns_filters.iter() {
         filtered_files.extend(filter_files_by_pattern(&pattern, changed_files.clone()));
     }
+    let duration = start.elapsed();
+    println!("Filtering files done in: {:?}", duration);
 
+    let start = Instant::now();
     for pattern in exclude_patterns_filters.iter() {
         filtered_files = filtered_files
             .iter()
@@ -50,6 +58,8 @@ fn main() {
             .map(|file| file.to_string())
             .collect();
     }
+    let duration = start.elapsed();
+    println!("Excluding files done in: {:?}", duration);
 
     println!("DIFF_FILES: {:?}", filtered_files);
     println!("DIFF_COUNT: {}", filtered_files.len());
