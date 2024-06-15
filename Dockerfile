@@ -14,6 +14,6 @@ COPY ./src ./src
 # RUN rm ./target/release/deps/git_diff*
 RUN cargo build --release
 
-WORKDIR /git-diff/target/release
+COPY --from=build /git-diff/target/release/git-diff /usr/local/bin/git-diff
 
-ENTRYPOINT ["./git-diff"]
+ENTRYPOINT ["git-diff"]
