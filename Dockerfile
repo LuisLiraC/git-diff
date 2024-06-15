@@ -14,8 +14,7 @@ COPY ./src ./src
 RUN rm ./target/release/deps/git_diff*
 RUN cargo build --release
 
-FROM gcr.io/distroless/cc AS runtime
-
-COPY --from=build /git-diff/target/release/git-diff .
+RUN pwd
+RUN ls -la
 
 ENTRYPOINT ["./git-diff"]
