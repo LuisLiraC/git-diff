@@ -11,11 +11,11 @@ RUN rm src/*.rs
 
 COPY ./src ./src
 
-RUN rm ./target/release/deps/git_diff*
+# RUN rm ./target/release/deps/git_diff*
 RUN cargo build --release
 
 RUN pwd
 RUN ls -la ./target/release
-COPY ./target/release/git-diff .
+# COPY ./target/release/git-diff .
 
-ENTRYPOINT ["./git-diff"]
+# ENTRYPOINT ["./git-diff"]
