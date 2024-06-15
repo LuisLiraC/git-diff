@@ -16,6 +16,7 @@ RUN cargo build --release
 
 RUN pwd
 RUN ls -la ./target/release
-# COPY ./target/release/git-diff .
+COPY ./target/release/git-diff .
+RUN ls -la
 
 # ENTRYPOINT ["./git-diff"]
