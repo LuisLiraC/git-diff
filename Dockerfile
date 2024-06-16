@@ -5,9 +5,11 @@ WORKDIR /git-diff
 COPY Cargo.toml Cargo.toml
 COPY Cargo.lock Cargo.lock
 
-RUN cargo build --release
 RUN pwd
 RUN ls -la
+
+RUN cargo build --release
+
 COPY src ./src
 
 RUN pwd
