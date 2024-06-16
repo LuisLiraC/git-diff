@@ -2,7 +2,8 @@ FROM rust:1.78.0 AS builder
 
 WORKDIR /git-diff
 
-COPY Cargo.toml Cargo.lock ./
+COPY Cargo.toml Cargo.toml
+COPY Cargo.lock Cargo.lock 
 
 RUN cargo build --release
 COPY src ./src
