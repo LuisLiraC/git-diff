@@ -12,7 +12,7 @@ RUN rm src/*.rs
 COPY ./src ./src
 RUN cargo build --release
 
-FROM debian:buster-slim
+FROM gcr.io/distroless/cc AS runtime
 
 COPY --from=builder /git-diff/target/release/git-diff /usr/local/bin/git-diff
 
