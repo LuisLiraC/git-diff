@@ -1,16 +1,16 @@
 FROM rust:1.78.0 AS builder
 
-RUN USER=root cargo new --bin git-diff
 WORKDIR /git-diff
 
-COPY ./Cargo.lock ./Cargo.lock
-COPY ./Cargo.toml ./Cargo.toml
-COPY ./src ./src
+COPY Cargo.toml Cargo.lock ./
 
 RUN cargo build --release
+COPY src ./src
 
-FROM gcr.io/distroless/cc AS runtime
+RUN cargo install --path .
 
-COPY --from=builder /git-diff/target/release/git-diff /usr/local/bin/git-diff
+FROM debian:buster-slim
 
-ENTRYPOINT ["/usr/local/bin/git-diff"]
+COPY --from=builder /usr/local/cargo/bin/git-diff /usr/local/bin/git-diff
+
+ENTRYPOINT ["git-diff"]
