@@ -12,10 +12,8 @@ RUN rm src/*.rs
 COPY ./src ./src
 RUN cargo build --release
 
-FROM debian:buster-slim
-
-RUN apt-get update && apt-get install -y libssl1.1 ca-certificates && rm -rf /var/lib/apt/lists/*
+FROM gcr.io/distroless/cc AS runtime
 
 COPY --from=builder /git-diff/target/release/git-diff /usr/local/bin/git-diff
 
-ENTRYPOINT ["git-diff"]
+ENTRYPOINT ["/git-diff"]
