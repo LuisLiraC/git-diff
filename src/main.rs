@@ -11,6 +11,7 @@ struct PatternFilter {
 }
 
 fn main() {
+    println!("Starting git diff action...");
     let args: Vec<String> = env::args().collect();
     let mut patterns_filters: Vec<PatternFilter> = Vec::new();
 
