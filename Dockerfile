@@ -6,7 +6,12 @@ COPY Cargo.toml Cargo.toml
 COPY Cargo.lock Cargo.lock
 
 RUN cargo build --release
+RUN pwd
+RUN ls -la
 COPY src ./src
+
+RUN pwd
+RUN ls -la
 
 RUN cargo install --path .
 
