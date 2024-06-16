@@ -6,3 +6,7 @@ edition = "2021"
 [dependencies]
 git2 = "0.18.3"
 glob = "0.3.1"
+
+[[bin]]
+name = "git-diff"
+path = "src/main.rs"
