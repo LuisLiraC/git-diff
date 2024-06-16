@@ -16,4 +16,4 @@ FROM gcr.io/distroless/cc AS runtime
 
 COPY --from=builder /git-diff/target/release/git-diff /usr/local/bin/git-diff
 
-ENTRYPOINT ["/git-diff"]
+ENTRYPOINT ["/usr/local/bin/git-diff"]
