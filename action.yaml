@@ -1,6 +1,37 @@
-name: "Git Diff Action"
-description: "Git Diff"
-
+name: 'Git Diff Action'
+description: 'Get changed files in a Rust repository'
+inputs:
+  patterns:
+    description: 'Patterns to filter changed files'
+    required: true
+    default: '*.rs,!tests/*'
+outputs:
+  DIFF_FILES:
+    description: 'List of changed files'
+    value: ''
+  DIFF_COUNT:
+    description: 'Count of changed files'
+    value: ''
 runs:
-  using: "docker"
-  image: "Dockerfile"
+  using: 'composite'
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Download release binary
+      shell: bash
+      run: |
+        curl -L -o your_rust_binary https://github.com/tu-usuario/tu-repositorio/releases/download/v1.0.0/your_rust_binary
+        chmod +x your_rust_binary
+
+    - name: Run Git Diff Action
+      shell: bash
+      id: git-diff
+      run: ./your_rust_binary --patterns="${{ inputs.patterns }}"
+
+    - name: Set outputs
+      shell: bash
+      id: set-outputs
+      run: |
+        echo "DIFF_FILES=${{ steps.git-diff.outputs.DIFF_FILES }}" >> $GITHUB_ENV
+        echo "DIFF_COUNT=${{ steps.git-diff.outputs.DIFF_COUNT }}" >> $GITHUB_ENV
