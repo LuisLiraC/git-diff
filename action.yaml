@@ -1,0 +1,30 @@
+name: 'Git Diff'
+description: 'Action to get the files that have been changed in a pull request'
+inputs:
+  patterns:
+    description: 'Patterns to search for'
+    required: true
+outputs:
+  DIFF_FILES:
+    description: 'List of files that have been changed'
+    value: ${{ steps.get-git-diff.outputs.DIFF_FILES }}
+  DIFF_COUNT:
+    description: 'Number of files that have been changed'
+    value: ${{ steps.get-git-diff.outputs.DIFF_COUNT }}
+runs:
+  using: 'composite'
+  steps:
+    - name: Get Binary
+      shell: bash
+      run: |
+        BIN_URL=$(curl https://api.github.com/repos/LuisLiraC/git-diff/releases/latest | jq -r '.assets[0].browser_download_url')
+        echo "Downloading from $BIN_URL"
+        curl -L $BIN_URL -o rust-binary.tgz
+        tar -xzvf rust-binary.tgz
+        mv ./Linux/git-diff ./git-diff
+
+    - name: Run git-diff
+      id: get-git-diff
+      shell: bash
+      run: |
+          ./git-diff --patterns='${{ inputs.patterns }}'
