@@ -57,3 +57,5 @@ jobs:
 
 > [!WARNING]
 > At this moment the action does not support branches with `/` in the name. For example, `feature/branch` will not work.
+
+> Changes
