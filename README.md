@@ -54,3 +54,6 @@ jobs:
         echo "Files: ${{ steps.diff.outputs.DIFF_FILES }}"
         echo "Count: ${{ steps.diff.outputs.DIFF_COUNT }}"
 ```
+
+> [!WARNING]
+> At this moment the action does not support branches with `/` in the name. For example, `feature/branch` will not work.
