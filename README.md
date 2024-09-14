@@ -57,3 +57,4 @@ jobs:
 
 > [!WARNING]
 > At this moment it only works with the `pull_request` event. It uses the `GITHUB_BASE_REF` environment variable to get the base branch of the PR and this environment variable is only available in the `pull_request` event.
+

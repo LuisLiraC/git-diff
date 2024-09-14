@@ -10,6 +10,8 @@ struct PatternFilter {
     exclude: bool,
 }
 
+// Change
+
 fn main() {
     let args: Vec<String> = env::args().collect();
     let mut patterns_filters: Vec<PatternFilter> = Vec::new();
