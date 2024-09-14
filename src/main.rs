@@ -14,9 +14,6 @@ fn main() {
     let args: Vec<String> = env::args().collect();
     let mut patterns_filters: Vec<PatternFilter> = Vec::new();
 
-    let mut exclude_patterns_filters: Vec<PatternFilter> = Vec::new();
-    let mut include_patterns_filters: Vec<PatternFilter> = Vec::new();
-
     for arg in args.iter() {
         if arg.starts_with("--patterns=") {
             patterns_filters = create_patterns_filters(&arg);
@@ -28,41 +25,19 @@ fn main() {
         return;
     }
 
-    patterns_filters.iter().for_each(|pattern_filter| {
-        if pattern_filter.exclude {
-            exclude_patterns_filters.push(pattern_filter.clone());
-        } else {
-            include_patterns_filters.push(pattern_filter.clone());
-        }
-    });
+    let (include_patterns_filters, exclude_patterns_filters) = categorize_filters(patterns_filters);
 
     let start = Instant::now();
     let changed_files = get_changed_files();
     let duration = start.elapsed();
     println!("Getting changed files done in: {:?}", duration);
 
-    let mut filtered_files: Vec<String> = Vec::new();
-
     let start = Instant::now();
-    for pattern in include_patterns_filters.iter() {
-        filtered_files.extend(filter_files_by_pattern(&pattern, changed_files.clone()));
-    }
+    let filtered_files = filter(changed_files, include_patterns_filters, exclude_patterns_filters);
     let duration = start.elapsed();
     println!("Filtering files done in: {:?}", duration);
 
-    let start = Instant::now();
-    for pattern in exclude_patterns_filters.iter() {
-        filtered_files = filtered_files
-            .iter()
-            .filter(|file| !Pattern::new(&pattern.pattern).expect("Failed to create pattern").matches(file))
-            .map(|file| file.to_string())
-            .collect();
-    }
-    let duration = start.elapsed();
-    println!("Excluding files done in: {:?}", duration);
-
-    println!("DIFF_FILES: {:?}", filtered_files);
-    println!("DIFF_COUNT: {}", filtered_files.len());
+    let count = get_count(filtered_files.clone());
 
     Command::new("sh")
         .arg("-c")
@@ -72,7 +47,7 @@ fn main() {
 
     Command::new("sh")
         .arg("-c")
-        .arg(format!("echo \"DIFF_COUNT={}\" >> $GITHUB_OUTPUT", filtered_files.len()))
+        .arg(format!("echo \"DIFF_COUNT={}\" >> $GITHUB_OUTPUT", count))
         .output()
         .expect("Failed to execute DIFF_COUNT command");
 }
@@ -144,15 +119,57 @@ fn get_changed_files() -> Vec<String> {
     changed_files
 }
 
-fn filter_files_by_pattern(pattern_filter: &PatternFilter, files: Vec<String>) -> Vec<String> {
+fn filter(changed_files: Vec<String>, include_patterns_filters: Vec<PatternFilter>, exclude_patterns_filters: Vec<PatternFilter>) -> Vec<String> {
+    let filtered_files: Vec<String> = include_patterns_filters
+        .iter()
+        .flat_map(|pattern| filter_files_by_pattern(pattern, &changed_files, &exclude_patterns_filters))
+        .collect();
+
+    filtered_files
+}
+
+fn filter_files_by_pattern(pattern_filter: &PatternFilter, files: &Vec<String>, exclude_patterns: &Vec<PatternFilter>) -> Vec<String> {
     let pattern = Pattern::new(&pattern_filter.pattern).expect("Failed to create pattern");
 
-    let filtered_files: Vec<String> = files
+    let mut filtered_files: Vec<String> = files
         .iter()
         .filter(|file| pattern.matches(file))
         .filter(|_| pattern_filter.exclude == false)
         .map(|file| file.to_string())
         .collect();
 
+    for exclude_pattern in exclude_patterns.iter() {
+        filtered_files = filtered_files
+            .iter()
+            .filter(|file| !Pattern::new(&exclude_pattern.pattern).expect("Failed to create pattern").matches(file))
+            .map(|file| file.to_string())
+            .collect();
+    }
+
     filtered_files
+}
+
+fn get_count(filtered_files: Vec<String>) -> usize {
+    filtered_files.len()
+}
+
+fn categorize_filters(filters: Vec<PatternFilter>) -> (Vec<PatternFilter>, Vec<PatternFilter>) {
+    let mut exclude_patterns_filters: Vec<PatternFilter> = Vec::new();
+    let mut include_patterns_filters: Vec<PatternFilter> = Vec::new();
+
+    filters.iter().for_each(|pattern_filter| {
+        if pattern_filter.exclude {
+            exclude_patterns_filters.push(pattern_filter.clone());
+        } else {
+            include_patterns_filters.push(pattern_filter.clone());
+        }
+    });
+
+    (include_patterns_filters, exclude_patterns_filters)
+}
+
+#[cfg(test)]
+mod tests {
+    mod unit;
+    mod integration;
 }
