@@ -28,4 +28,5 @@ runs:
       run: |
           PATTERNS="${{ inputs.patterns }}"
           COMMA_SEPARATED_PATTERNS=$(echo "$PATTERNS" | tr '\n' ',' | sed -e 's/,$//' | sed 's/,$//' | sed 's/ //g')
+          echo "Patterns: $COMMA_SEPARATED_PATTERNS"
           ./git-diff --patterns='$COMMA_SEPARATED_PATTERNS'
