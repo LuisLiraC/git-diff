@@ -1,5 +1,8 @@
 name: 'git-diff-rust'
 description: 'Action to get the files that have been changed in a pull request'
+branding:
+  icon: 'git-pull-request'
+  color: 'purple'
 inputs:
   patterns:
     description: 'Patterns to search for'
