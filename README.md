@@ -45,7 +45,7 @@ jobs:
 
     - name: Get changed files
       id: diff
-      uses: LuisLiraC/git-diff@main
+      uses: LuisLiraC/git-diff@master
       with:
         patterns: '*.rs,src/**/*,!README.md'
 
