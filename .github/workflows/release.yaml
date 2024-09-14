@@ -1,11 +1,12 @@
 name: Release Binary
 
 on:
-  create:
+  push:
+    tags:
+      - 'v*'
 
 jobs:
   build-artifacts:
-    if: ${{ startsWith(github.ref, 'refs/tags/v') }}
     runs-on: ubuntu-latest
     name: Build Artifacts
     env:
