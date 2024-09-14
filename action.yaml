@@ -18,8 +18,7 @@ runs:
       shell: bash
       run: |
         BIN_URL=$(curl https://api.github.com/repos/LuisLiraC/git-diff/releases/latest | jq -r '.assets[0].browser_download_url')
-        echo "Downloading from $BIN_URL"
-        curl -L $BIN_URL -o rust-binary.tgz
+        curl -s -L $BIN_URL -o rust-binary.tgz
         tar -xzvf rust-binary.tgz
         mv ./Linux/git-diff ./git-diff
 
@@ -27,4 +26,6 @@ runs:
       id: get-git-diff
       shell: bash
       run: |
-          ./git-diff --patterns='${{ inputs.patterns }}'
+          PATTERNS="${{ inputs.patterns }}"
+          COMMA_SEPARATED_PATTERNS=$(echo "$PATTERNS" | tr '\n' ',' | sed -e 's/,$//' | sed 's/,$//' | sed 's/ //g')
+          ./git-diff --patterns='$COMMA_SEPARATED_PATTERNS'
