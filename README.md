@@ -56,4 +56,4 @@ jobs:
 ```
 
 > [!WARNING]
-> At this moment the action does not support branches with `/` in the name. For example, `feature/branch` will not work.
+> At this moment it only works with the `pull_request` event. It uses the `GITHUB_BASE_REF` environment variable to get the base branch of the PR and this environment variable is only available in the `pull_request` event.
