@@ -1,0 +1,24 @@
+name: Git Diff example
+
+on:
+  push:
+    branches:
+      - example/*
+
+jobs:
+  check_diff:
+    runs-on: ubuntu-latest
+    name: Check Diff
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get changed files
+        uses: LuisLiraC/git-diff@master
+        id: diff
+        with:
+          patterns: '*.rs,!*.md'
+
+      - name: Get diff outputs
+        run: |
+          echo "Files: ${{ steps.diff.outputs.DIFF_FILES }}"
+          echo "Count: ${{ steps.diff.outputs.DIFF_COUNT }}"
