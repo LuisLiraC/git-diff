@@ -1,4 +1,4 @@
-name: 'Git Diff'
+name: 'git-diff'
 description: 'Action to get the files that have been changed in a pull request'
 inputs:
   patterns:

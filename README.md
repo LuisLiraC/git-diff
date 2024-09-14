@@ -56,7 +56,7 @@ jobs:
 
     - name: Get changed files
       id: diff
-      uses: LuisLiraC/git-diff@master
+      uses: LuisLiraC/git-diff@master # Use the latest version. You can also use a specific version like v1.0.0
       with:
         patterns: '*.rs,src/**/*,!README.md'
 
