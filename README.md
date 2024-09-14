@@ -18,6 +18,17 @@ Examples:
 - `src/**/*`: All files within the `src` directory and its subdirectories
 - `!README.md`: Exclude the README.md file
 
+Patterns could be a single line or multiline string.
+```yaml
+patterns: |
+  *.rs
+  src/**/*
+  !README.md
+```
+```yaml
+patterns: '*.rs,src/**/*,!README.md'
+```
+
 ## Outputs
 
 ### `DIFF_FILES`
@@ -56,4 +67,4 @@ jobs:
 ```
 
 > [!WARNING]
-> At this moment it only works with the `pull_request` event. It uses the `GITHUB_BASE_REF` environment variable to get the base branch of the PR and this environment variable is only available in the `pull_request` event.
+> At this moment it only works with the `pull_request` event. It uses the `GITHUB_BASE_REF` environment variable to get the base branch of the PR and this it is only available in the `pull_request` event.
