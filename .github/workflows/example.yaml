@@ -1,9 +1,9 @@
 name: Git Diff example
 
 on:
-  push:
+  pull_request:
     branches:
-      - example-*
+      - master
 
 jobs:
   check_diff:
