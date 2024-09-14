@@ -1,4 +1,4 @@
-name: Hello World
+name: Git Diff
 
 on:
   pull_request:
@@ -10,5 +10,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: LuisLiraC/hello-world-action@main
+        id: git-diff
         with:
-          who-to-greet: 'Rustaceans'
+          patterns: '*.toml,*.rs'
+
+      - name: Get the output time
+        run: |
+          echo "Files ${{ steps.git-diff.outputs.DIFF_FILES }}"
+          echo "Count ${{ steps.git-diff.outputs.DIFF_COUNT }}"
