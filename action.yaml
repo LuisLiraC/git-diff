@@ -20,7 +20,7 @@ runs:
     - name: Get Binary
       shell: bash
       run: |
-        BIN_URL=$(curl https://api.github.com/repos/LuisLiraC/git-diff/releases/latest | jq -r '.assets[0].browser_download_url')
+        BIN_URL=$(curl https://api.github.com/repos/LuisLiraC/git-diff/releases/tags/v1.0.0 | jq -r '.assets[0].browser_download_url')
         curl -s -L $BIN_URL -o rust-binary.tgz
         tar -xzvf rust-binary.tgz
         mv ./Linux/git-diff ./git-diff
