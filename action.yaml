@@ -1,4 +1,4 @@
-name: 'git-diff-rust'
+name: 'Git Diff 🦀'
 description: 'Action to get the files that have been changed in a pull request'
 branding:
   icon: 'git-pull-request'
