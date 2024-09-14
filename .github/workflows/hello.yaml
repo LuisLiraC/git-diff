@@ -1,0 +1,14 @@
+name: Hello World
+
+on:
+  pull_request:
+    types: [labeled]
+
+
+jobs:
+  hello:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: LuisLiraC/hello-world-action@main
+        with:
+          who-to-greet: 'Rustaceans'
