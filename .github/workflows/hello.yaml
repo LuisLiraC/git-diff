@@ -15,7 +15,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - uses: LuisLiraC/hello-world-action@main
+      - uses: LuisLiraC/git-diff@feat/action-file
         id: git-diff
         with:
           patterns: '*.toml,*.rs'
