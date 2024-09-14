@@ -1,14 +1,11 @@
 name: Release Binary
 
 on:
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: 'Tag to release'
-        required: true
+  create:
 
 jobs:
   build-artifacts:
+    if: ${{ startsWith(github.ref, 'refs/tags/v') }}
     runs-on: ubuntu-latest
     name: Build Artifacts
     env:
@@ -72,4 +69,3 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           artifacts: "Linux/Linux.tgz"
-          tag: ${{ github.event.inputs.tag }}
