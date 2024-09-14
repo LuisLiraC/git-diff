@@ -3,7 +3,7 @@ name: Git Diff example
 on:
   push:
     branches:
-      - example/*
+      - example-*
 
 jobs:
   check_diff:
