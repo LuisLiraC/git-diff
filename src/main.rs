@@ -1,10 +1,11 @@
 use git2::Repository;
+use std::collections::HashSet;
 use std::env;
 use glob::Pattern;
 use std::process::Command;
 use std::time::Instant;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 struct PatternFilter {
     pattern: String,
     exclude: bool,
@@ -32,12 +33,17 @@ fn main() {
     let duration = start.elapsed();
     println!("Getting changed files done in: {:?}", duration);
 
+    println!("Changed files: {:?}", changed_files);
+
     let start = Instant::now();
-    let filtered_files = filter(changed_files, include_patterns_filters, exclude_patterns_filters);
+    let filtered_files = filter_files(changed_files, include_patterns_filters, exclude_patterns_filters);
     let duration = start.elapsed();
     println!("Filtering files done in: {:?}", duration);
 
     let count = get_count(filtered_files.clone());
+
+    println!("Filtered files: {:?}", filtered_files);
+    println!("Count: {}", count);
 
     Command::new("sh")
         .arg("-c")
@@ -53,10 +59,18 @@ fn main() {
 }
 
 fn create_patterns_filters(arg: &str) -> Vec<PatternFilter> {
-    let patterns = arg
+    let binding = arg
         .split('=')
         .last()
         .expect("Failed to get patterns")
+        .replace(" ", "")
+        .replace("\n", ",")
+        .replace("\r", "")
+        .replace(",,", ",")
+        .trim_end_matches(',')
+        .to_string();
+
+    let patterns = binding
         .split(',')
         .collect::<Vec<&str>>();
 
@@ -85,6 +99,7 @@ fn get_changed_files() -> Vec<String> {
     let head = repository.head().expect("Failed to get HEAD");
     let head_commit = head.peel_to_commit().expect("Failed to peel HEAD to commit");
 
+    // Refers to base branch in case of pull request. For example: main
     let base_ref_env = env::var("GITHUB_BASE_REF").expect("Failed to get GITHUB_BASE_REF env variable");
 
     Command::new("sh")
@@ -119,49 +134,39 @@ fn get_changed_files() -> Vec<String> {
     changed_files
 }
 
-fn filter(changed_files: Vec<String>, include_patterns_filters: Vec<PatternFilter>, exclude_patterns_filters: Vec<PatternFilter>) -> Vec<String> {
-    let filtered_files: Vec<String> = include_patterns_filters
-        .iter()
-        .flat_map(|pattern| filter_files_by_pattern(pattern, &changed_files, &exclude_patterns_filters))
-        .collect();
+fn filter_files(changed_files: Vec<String>, include_patterns_filters: HashSet<String>, exclude_patterns_filters: HashSet<String>) -> HashSet<String> {
+    let mut hash_set_filtered_files = HashSet::new();
 
-    filtered_files
-}
+    for changed_file in changed_files.iter() {
+        include_patterns_filters.iter().for_each(|pattern| {
+            if Pattern::new(pattern).expect("Failed to create pattern").matches(changed_file) {
+                hash_set_filtered_files.insert(changed_file.to_string());
+            }
 
-fn filter_files_by_pattern(pattern_filter: &PatternFilter, files: &Vec<String>, exclude_patterns: &Vec<PatternFilter>) -> Vec<String> {
-    let pattern = Pattern::new(&pattern_filter.pattern).expect("Failed to create pattern");
-
-    let mut filtered_files: Vec<String> = files
-        .iter()
-        .filter(|file| pattern.matches(file))
-        .filter(|_| pattern_filter.exclude == false)
-        .map(|file| file.to_string())
-        .collect();
-
-    for exclude_pattern in exclude_patterns.iter() {
-        filtered_files = filtered_files
-            .iter()
-            .filter(|file| !Pattern::new(&exclude_pattern.pattern).expect("Failed to create pattern").matches(file))
-            .map(|file| file.to_string())
-            .collect();
+            exclude_patterns_filters.iter().for_each(|pattern| {
+                if Pattern::new(pattern).expect("Failed to create pattern").matches(changed_file) {
+                    hash_set_filtered_files.remove(changed_file);
+                }
+            });
+        });
     }
 
-    filtered_files
+    hash_set_filtered_files
 }
 
-fn get_count(filtered_files: Vec<String>) -> usize {
+fn get_count(filtered_files: HashSet<String>) -> usize {
     filtered_files.len()
 }
 
-fn categorize_filters(filters: Vec<PatternFilter>) -> (Vec<PatternFilter>, Vec<PatternFilter>) {
-    let mut exclude_patterns_filters: Vec<PatternFilter> = Vec::new();
-    let mut include_patterns_filters: Vec<PatternFilter> = Vec::new();
+fn categorize_filters(filters: Vec<PatternFilter>) -> (HashSet<String>, HashSet<String>) {
+    let mut exclude_patterns_filters: HashSet<String> = HashSet::new();
+    let mut include_patterns_filters: HashSet<String> = HashSet::new();
 
     filters.iter().for_each(|pattern_filter| {
         if pattern_filter.exclude {
-            exclude_patterns_filters.push(pattern_filter.clone());
+            exclude_patterns_filters.insert(pattern_filter.clone().pattern);
         } else {
-            include_patterns_filters.push(pattern_filter.clone());
+            include_patterns_filters.insert(pattern_filter.clone().pattern);
         }
     });
 
