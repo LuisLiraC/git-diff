@@ -5,7 +5,7 @@ mod unit {
     use super::*;
 
     #[test]
-    fn test_create_patterns_filters() {
+    fn test_create_patterns_filters_single_line() {
         let arg = "--patterns=*.rs,!test/*.rs";
         let filters = create_patterns_filters(arg);
         assert_eq!(filters.len(), 2);
@@ -16,6 +16,23 @@ mod unit {
         );
         assert_eq!(filters[1].pattern, "test/*.rs");
         assert_eq!(filters[1].exclude, true);
+    }
+
+    #[test]
+    fn test_create_patterns_filters_multiple_lines() {
+        let arg = "--patterns=*.rs
+        !test/*.rs
+        .gitignore
+        ";
+        let filters = create_patterns_filters(arg);
+
+        assert_eq!(filters.len(), 3);
+        assert_eq!(filters[0].pattern, "*.rs");
+        assert_eq!(filters[0].exclude, false);
+        assert_eq!(filters[1].pattern, "test/*.rs");
+        assert_eq!(filters[1].exclude, true);
+        assert_eq!(filters[2].pattern, ".gitignore");
+        assert_eq!(filters[2].exclude, false);
     }
 
     #[test]

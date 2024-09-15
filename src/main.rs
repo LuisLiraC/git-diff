@@ -67,6 +67,7 @@ fn create_patterns_filters(arg: &str) -> Vec<PatternFilter> {
         .replace("\n", ",")
         .replace("\r", "")
         .replace(",,", ",")
+        .trim_end_matches(',')
         .to_string();
 
     let patterns = binding
