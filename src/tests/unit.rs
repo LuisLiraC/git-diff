@@ -8,12 +8,12 @@ fn test_create_patterns_filters_single_line() {
     let filters = create_patterns_filters(arg);
     assert_eq!(filters.len(), 2);
     assert_eq!(filters[0].pattern, "*.rs");
-    assert_eq!(
-        filters[0].exclude, false,
+    assert!(
+        !filters[0].exclude,
         "Expected 'exclude' to be false for pattern '*.rs'"
     );
     assert_eq!(filters[1].pattern, "test/*.rs");
-    assert_eq!(filters[1].exclude, true);
+    assert!(filters[1].exclude);
 }
 
 #[test]
