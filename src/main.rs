@@ -31,29 +31,29 @@ fn main() {
     let start = Instant::now();
     let changed_files = get_changed_files();
     let duration = start.elapsed();
-    println!("Getting changed files done in: {:?}", duration);
+    println!("Getting changed files done in: {duration:?}");
 
-    println!("Changed files: {:?}", changed_files);
+    println!("Changed files: {changed_files:?}");
 
     let start = Instant::now();
     let filtered_files = filter_files(&changed_files, &include_patterns_filters, &exclude_patterns_filters);
     let duration = start.elapsed();
-    println!("Filtering files done in: {:?}", duration);
+    println!("Filtering files done in: {duration:?}");
 
     let count = get_count(&filtered_files);
 
-    println!("Filtered files: {:?}", filtered_files);
-    println!("Count: {}", count);
+    println!("Filtered files: {filtered_files:?}");
+    println!("Count: {count}");
 
     Command::new("sh")
         .arg("-c")
-        .arg(format!("echo \"DIFF_FILES={:?}\" >> $GITHUB_OUTPUT", filtered_files))
+        .arg(format!("echo \"DIFF_FILES={filtered_files:?}\" >> $GITHUB_OUTPUT"))
         .output()
         .expect("Failed to execute DIFF_FILES command");
 
     Command::new("sh")
         .arg("-c")
-        .arg(format!("echo \"DIFF_COUNT={}\" >> $GITHUB_OUTPUT", count))
+        .arg(format!("echo \"DIFF_COUNT={count}\" >> $GITHUB_OUTPUT"))
         .output()
         .expect("Failed to execute DIFF_COUNT command");
 }
@@ -104,11 +104,11 @@ fn get_changed_files() -> Vec<String> {
 
     Command::new("sh")
         .arg("-c")
-        .arg(format!("git fetch origin {}", base_ref_env))
+        .arg(format!("git fetch origin {base_ref_env}"))
         .output()
         .expect("Failed to execute fetch branch command");
 
-    let base_ref_string = format!("refs/remotes/origin/{}", base_ref_env);
+    let base_ref_string = format!("refs/remotes/origin/{base_ref_env}");
     let base_ref = repository.find_reference(&base_ref_string).expect("Failed to find default branch");
     let base_commit = base_ref.peel_to_commit().expect("Failed to peel default branch to commit");
 
