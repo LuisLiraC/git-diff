@@ -138,17 +138,17 @@ fn filter_files(changed_files: &Vec<String>, include_patterns_filters: &HashSet<
     let mut hash_set_filtered_files = HashSet::new();
 
     for changed_file in changed_files {
-        include_patterns_filters.iter().for_each(|pattern| {
+        for pattern in include_patterns_filters {
             if Pattern::new(pattern).expect("Failed to create pattern").matches(changed_file) {
                 hash_set_filtered_files.insert(changed_file.to_string());
             }
 
-            exclude_patterns_filters.iter().for_each(|pattern| {
+            for pattern in exclude_patterns_filters {
                 if Pattern::new(pattern).expect("Failed to create pattern").matches(changed_file) {
                     hash_set_filtered_files.remove(changed_file);
                 }
-            });
-        });
+            }
+        }
     }
 
     hash_set_filtered_files
@@ -162,13 +162,13 @@ fn categorize_filters(filters: &Vec<PatternFilter>) -> (HashSet<String>, HashSet
     let mut exclude_patterns_filters: HashSet<String> = HashSet::new();
     let mut include_patterns_filters: HashSet<String> = HashSet::new();
 
-    filters.iter().for_each(|pattern_filter| {
+    for pattern_filter in filters {
         if pattern_filter.exclude {
             exclude_patterns_filters.insert(pattern_filter.clone().pattern);
         } else {
             include_patterns_filters.insert(pattern_filter.clone().pattern);
         }
-    });
+    }
 
     (include_patterns_filters, exclude_patterns_filters)
 }
