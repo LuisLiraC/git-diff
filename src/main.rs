@@ -15,7 +15,7 @@ fn main() {
     let args: Vec<String> = env::args().collect();
     let mut patterns_filters: Vec<PatternFilter> = Vec::new();
 
-    for arg in args.iter() {
+    for arg in &args {
         if arg.starts_with("--patterns=") {
             patterns_filters = create_patterns_filters(arg);
         }
@@ -76,7 +76,7 @@ fn create_patterns_filters(arg: &str) -> Vec<PatternFilter> {
 
     let mut patterns_filters: Vec<PatternFilter> = Vec::new();
 
-    for pattern in patterns.iter() {
+    for pattern in &patterns {
         let exclude = pattern.starts_with('!');
         let pattern = if exclude {
             pattern[1..].to_string()
@@ -137,7 +137,7 @@ fn get_changed_files() -> Vec<String> {
 fn filter_files(changed_files: &Vec<String>, include_patterns_filters: &HashSet<String>, exclude_patterns_filters: &HashSet<String>) -> HashSet<String> {
     let mut hash_set_filtered_files = HashSet::new();
 
-    for changed_file in changed_files.iter() {
+    for changed_file in changed_files {
         include_patterns_filters.iter().for_each(|pattern| {
             if Pattern::new(pattern).expect("Failed to create pattern").matches(changed_file) {
                 hash_set_filtered_files.insert(changed_file.to_string());
