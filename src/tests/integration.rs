@@ -8,7 +8,7 @@ mod integration {
     fn test_filter() {
         let arg = "--patterns=*.rs,!*..txt";
         let files = vec![
-            String::from("main.rs"),
+            String::from("src/main.rs"),
             String::from("lib.rs"),
             String::from("test.txt"),
         ];
@@ -21,10 +21,12 @@ mod integration {
 
         let count = get_count(filtered_files.clone());
 
-        assert_eq!(
-            filtered_files,
-            vec![String::from("main.rs"), String::from("lib.rs")]
-        );
+        let expected_filtered_files = HashSet::from([
+            String::from("src/main.rs"),
+            String::from("lib.rs"),
+        ]);
+
+        assert_eq!(filtered_files, expected_filtered_files);
         assert_eq!(count, 2);
     }
 }

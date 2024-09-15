@@ -40,13 +40,17 @@ mod unit {
     #[test]
     fn test_filter() {
         let files = vec![
-            String::from("main.rs"),
+            String::from("src/main.rs"),
             String::from("lib.rs"),
             String::from("test.txt"),
         ];
         let include_patterns_filters = vec![
             PatternFilter {
                 pattern: String::from("*.rs"),
+                exclude: false,
+            },
+            PatternFilter {
+                pattern: String::from("src/**"),
                 exclude: false,
             },
             PatternFilter {
@@ -59,10 +63,12 @@ mod unit {
             exclude: true,
         }];
         let filtered_files = filter(files, include_patterns_filters, exclude_patterns_filters);
-        assert_eq!(
-            filtered_files,
-            vec![String::from("main.rs"), String::from("lib.rs")]
-        );
+        let expected_filtered_files = HashSet::from([
+            String::from("src/main.rs"),
+            String::from("lib.rs"),
+        ]);
+
+        assert_eq!(filtered_files, expected_filtered_files);
     }
 
     #[test]
@@ -123,11 +129,11 @@ mod unit {
 
     #[test]
     fn test_get_count() {
-        let files = vec![
+        let files = HashSet::from([
             String::from("main.rs"),
             String::from("lib.rs"),
             String::from("version.txt"),
-        ];
+        ]);
         let count = get_count(files);
         assert_eq!(count, 3);
     }

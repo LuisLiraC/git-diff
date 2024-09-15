@@ -1,10 +1,11 @@
 use git2::Repository;
+use std::collections::HashSet;
 use std::env;
 use glob::Pattern;
 use std::process::Command;
 use std::time::Instant;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 struct PatternFilter {
     pattern: String,
     exclude: bool,
@@ -32,12 +33,17 @@ fn main() {
     let duration = start.elapsed();
     println!("Getting changed files done in: {:?}", duration);
 
+    println!("Changed files: {:?}", changed_files);
+
     let start = Instant::now();
     let filtered_files = filter(changed_files, include_patterns_filters, exclude_patterns_filters);
     let duration = start.elapsed();
     println!("Filtering files done in: {:?}", duration);
 
     let count = get_count(filtered_files.clone());
+
+    println!("Filtered files: {:?}", filtered_files);
+    println!("Count: {}", count);
 
     Command::new("sh")
         .arg("-c")
@@ -53,10 +59,17 @@ fn main() {
 }
 
 fn create_patterns_filters(arg: &str) -> Vec<PatternFilter> {
-    let patterns = arg
+    let binding = arg
         .split('=')
         .last()
         .expect("Failed to get patterns")
+        .replace(" ", "")
+        .replace("\n", ",")
+        .replace("\r", "")
+        .replace(",,", ",")
+        .to_string();
+
+    let patterns = binding
         .split(',')
         .collect::<Vec<&str>>();
 
@@ -120,13 +133,16 @@ fn get_changed_files() -> Vec<String> {
     changed_files
 }
 
-fn filter(changed_files: Vec<String>, include_patterns_filters: Vec<PatternFilter>, exclude_patterns_filters: Vec<PatternFilter>) -> Vec<String> {
+fn filter(changed_files: Vec<String>, include_patterns_filters: Vec<PatternFilter>, exclude_patterns_filters: Vec<PatternFilter>) -> HashSet<String> {
     let filtered_files: Vec<String> = include_patterns_filters
         .iter()
         .flat_map(|pattern| filter_files_by_pattern(pattern, &changed_files, &exclude_patterns_filters))
         .collect();
 
-    filtered_files
+    let mut hash_set_filtered_files = HashSet::new();
+    hash_set_filtered_files.extend(filtered_files.clone());
+
+    hash_set_filtered_files
 }
 
 fn filter_files_by_pattern(pattern_filter: &PatternFilter, files: &Vec<String>, exclude_patterns: &Vec<PatternFilter>) -> Vec<String> {
@@ -150,7 +166,7 @@ fn filter_files_by_pattern(pattern_filter: &PatternFilter, files: &Vec<String>, 
     filtered_files
 }
 
-fn get_count(filtered_files: Vec<String>) -> usize {
+fn get_count(filtered_files: HashSet<String>) -> usize {
     filtered_files.len()
 }
 
