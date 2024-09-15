@@ -63,9 +63,9 @@ fn create_patterns_filters(arg: &str) -> Vec<PatternFilter> {
         .split('=')
         .last()
         .expect("Failed to get patterns")
-        .replace(" ", "")
-        .replace("\n", ",")
-        .replace("\r", "")
+        .replace(' ', "")
+        .replace('\n', ",")
+        .replace('\r', "")
         .replace(",,", ",")
         .trim_end_matches(',')
         .to_string();
