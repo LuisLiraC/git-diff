@@ -36,7 +36,7 @@ fn main() {
     println!("Changed files: {:?}", changed_files);
 
     let start = Instant::now();
-    let filtered_files = filter(changed_files, include_patterns_filters, exclude_patterns_filters);
+    let filtered_files = filter_files(changed_files, include_patterns_filters, exclude_patterns_filters);
     let duration = start.elapsed();
     println!("Filtering files done in: {:?}", duration);
 
@@ -133,52 +133,39 @@ fn get_changed_files() -> Vec<String> {
     changed_files
 }
 
-fn filter(changed_files: Vec<String>, include_patterns_filters: Vec<PatternFilter>, exclude_patterns_filters: Vec<PatternFilter>) -> HashSet<String> {
-    let filtered_files: Vec<String> = include_patterns_filters
-        .iter()
-        .flat_map(|pattern| filter_files_by_pattern(pattern, &changed_files, &exclude_patterns_filters))
-        .collect();
-
+fn filter_files(changed_files: Vec<String>, include_patterns_filters: HashSet<String>, exclude_patterns_filters: HashSet<String>) -> HashSet<String> {
     let mut hash_set_filtered_files = HashSet::new();
-    hash_set_filtered_files.extend(filtered_files.clone());
 
-    hash_set_filtered_files
-}
+    for changed_file in changed_files.iter() {
+        include_patterns_filters.iter().for_each(|pattern| {
+            if Pattern::new(pattern).expect("Failed to create pattern").matches(changed_file) {
+                hash_set_filtered_files.insert(changed_file.to_string());
+            }
 
-fn filter_files_by_pattern(pattern_filter: &PatternFilter, files: &Vec<String>, exclude_patterns: &Vec<PatternFilter>) -> Vec<String> {
-    let pattern = Pattern::new(&pattern_filter.pattern).expect("Failed to create pattern");
-
-    let mut filtered_files: Vec<String> = files
-        .iter()
-        .filter(|file| pattern.matches(file))
-        .filter(|_| pattern_filter.exclude == false)
-        .map(|file| file.to_string())
-        .collect();
-
-    for exclude_pattern in exclude_patterns.iter() {
-        filtered_files = filtered_files
-            .iter()
-            .filter(|file| !Pattern::new(&exclude_pattern.pattern).expect("Failed to create pattern").matches(file))
-            .map(|file| file.to_string())
-            .collect();
+            exclude_patterns_filters.iter().for_each(|pattern| {
+                if Pattern::new(pattern).expect("Failed to create pattern").matches(changed_file) {
+                    hash_set_filtered_files.remove(changed_file);
+                }
+            });
+        });
     }
 
-    filtered_files
+    hash_set_filtered_files
 }
 
 fn get_count(filtered_files: HashSet<String>) -> usize {
     filtered_files.len()
 }
 
-fn categorize_filters(filters: Vec<PatternFilter>) -> (Vec<PatternFilter>, Vec<PatternFilter>) {
-    let mut exclude_patterns_filters: Vec<PatternFilter> = Vec::new();
-    let mut include_patterns_filters: Vec<PatternFilter> = Vec::new();
+fn categorize_filters(filters: Vec<PatternFilter>) -> (HashSet<String>, HashSet<String>) {
+    let mut exclude_patterns_filters: HashSet<String> = HashSet::new();
+    let mut include_patterns_filters: HashSet<String> = HashSet::new();
 
     filters.iter().for_each(|pattern_filter| {
         if pattern_filter.exclude {
-            exclude_patterns_filters.push(pattern_filter.clone());
+            exclude_patterns_filters.insert(pattern_filter.clone().pattern);
         } else {
-            include_patterns_filters.push(pattern_filter.clone());
+            include_patterns_filters.insert(pattern_filter.clone().pattern);
         }
     });
 

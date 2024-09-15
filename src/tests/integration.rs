@@ -17,7 +17,7 @@ mod integration {
 
         let (include_patterns_filters, exclude_patterns_filters) = categorize_filters(filters);
 
-        let filtered_files = filter(files, include_patterns_filters, exclude_patterns_filters);
+        let filtered_files = filter_files(files, include_patterns_filters, exclude_patterns_filters);
 
         let count = get_count(filtered_files.clone());
 
