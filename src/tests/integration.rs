@@ -13,11 +13,11 @@ fn test_filter() {
 
     let filters = create_patterns_filters(arg);
 
-    let (include_patterns_filters, exclude_patterns_filters) = categorize_filters(filters);
+    let (include_patterns_filters, exclude_patterns_filters) = categorize_filters(&filters);
 
-    let filtered_files = filter_files(files, include_patterns_filters, exclude_patterns_filters);
+    let filtered_files = filter_files(&files, &include_patterns_filters, &exclude_patterns_filters);
 
-    let count = get_count(filtered_files.clone());
+    let count = get_count(&filtered_files);
 
     let expected_filtered_files = HashSet::from([
         String::from("src/main.rs"),

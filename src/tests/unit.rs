@@ -26,11 +26,11 @@ fn test_create_patterns_filters_multiple_lines() {
 
     assert_eq!(filters.len(), 3);
     assert_eq!(filters[0].pattern, "*.rs");
-    assert_eq!(filters[0].exclude, false);
+    assert!(!filters[0].exclude);
     assert_eq!(filters[1].pattern, "test/*.rs");
-    assert_eq!(filters[1].exclude, true);
+    assert!(filters[1].exclude);
     assert_eq!(filters[2].pattern, ".gitignore");
-    assert_eq!(filters[2].exclude, false);
+    assert!(!filters[2].exclude);
 }
 
 #[test]
@@ -45,11 +45,11 @@ fn test_categorize_filters() {
             exclude: true,
         },
     ];
-    let (include_patterns_filters, exclude_patterns_filters) = categorize_filters(filters);
+    let (include_patterns_filters, exclude_patterns_filters) = categorize_filters(&filters);
     assert_eq!(include_patterns_filters.len(), 1);
     assert_eq!(exclude_patterns_filters.len(), 1);
-    assert_eq!(include_patterns_filters.contains("*.rs"), true);
-    assert_eq!(exclude_patterns_filters.contains("test/*.rs"), true);
+    assert!(include_patterns_filters.contains("*.rs"));
+    assert!(exclude_patterns_filters.contains("test/*.rs"));
 }
 
 #[test]
@@ -67,7 +67,7 @@ fn test_filter() {
     let exclude_patterns_filters = HashSet::from([
         String::from("test.txt")
     ]);
-    let filtered_files = filter_files(files, include_patterns_filters, exclude_patterns_filters);
+    let filtered_files = filter_files(&files, &include_patterns_filters, &exclude_patterns_filters);
     let expected_filtered_files = HashSet::from([
         String::from("src/main.rs"),
         String::from("lib.rs"),
@@ -93,7 +93,7 @@ fn test_filter_exclude_files_exclusion() {
         String::from("test.txt"),
     ];
 
-    let filtered_files = filter_files(files, include_patterns_filters, exclude_patterns_filters);
+    let filtered_files = filter_files(&files, &include_patterns_filters, &exclude_patterns_filters);
     let expected_filtered_files = HashSet::from([
         String::from("main.rs"),
         String::from("lib.rs"),
@@ -110,6 +110,6 @@ fn test_get_count() {
         String::from("lib.rs"),
         String::from("version.txt"),
     ]);
-    let count = get_count(files);
+    let count = get_count(&files);
     assert_eq!(count, 3);
 }

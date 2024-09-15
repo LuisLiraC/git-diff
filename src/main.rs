@@ -17,7 +17,7 @@ fn main() {
 
     for arg in args.iter() {
         if arg.starts_with("--patterns=") {
-            patterns_filters = create_patterns_filters(&arg);
+            patterns_filters = create_patterns_filters(arg);
         }
     }
 
@@ -26,7 +26,7 @@ fn main() {
         return;
     }
 
-    let (include_patterns_filters, exclude_patterns_filters) = categorize_filters(patterns_filters);
+    let (include_patterns_filters, exclude_patterns_filters) = categorize_filters(&patterns_filters);
 
     let start = Instant::now();
     let changed_files = get_changed_files();
@@ -36,11 +36,11 @@ fn main() {
     println!("Changed files: {:?}", changed_files);
 
     let start = Instant::now();
-    let filtered_files = filter_files(changed_files, include_patterns_filters, exclude_patterns_filters);
+    let filtered_files = filter_files(&changed_files, &include_patterns_filters, &exclude_patterns_filters);
     let duration = start.elapsed();
     println!("Filtering files done in: {:?}", duration);
 
-    let count = get_count(filtered_files.clone());
+    let count = get_count(&filtered_files);
 
     println!("Filtered files: {:?}", filtered_files);
     println!("Count: {}", count);
@@ -134,7 +134,7 @@ fn get_changed_files() -> Vec<String> {
     changed_files
 }
 
-fn filter_files(changed_files: Vec<String>, include_patterns_filters: HashSet<String>, exclude_patterns_filters: HashSet<String>) -> HashSet<String> {
+fn filter_files(changed_files: &Vec<String>, include_patterns_filters: &HashSet<String>, exclude_patterns_filters: &HashSet<String>) -> HashSet<String> {
     let mut hash_set_filtered_files = HashSet::new();
 
     for changed_file in changed_files.iter() {
@@ -154,11 +154,11 @@ fn filter_files(changed_files: Vec<String>, include_patterns_filters: HashSet<St
     hash_set_filtered_files
 }
 
-fn get_count(filtered_files: HashSet<String>) -> usize {
+fn get_count(filtered_files: &HashSet<String>) -> usize {
     filtered_files.len()
 }
 
-fn categorize_filters(filters: Vec<PatternFilter>) -> (HashSet<String>, HashSet<String>) {
+fn categorize_filters(filters: &Vec<PatternFilter>) -> (HashSet<String>, HashSet<String>) {
     let mut exclude_patterns_filters: HashSet<String> = HashSet::new();
     let mut include_patterns_filters: HashSet<String> = HashSet::new();
 
