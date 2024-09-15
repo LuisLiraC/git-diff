@@ -57,10 +57,10 @@ jobs:
           name: ${{ runner.os }}
           path: ${{ runner.os }}.tgz
 
-  create-release:
+  create-pre-release:
     needs: [build-artifacts]
     runs-on: ubuntu-latest
-    name: Create Release
+    name: Create Pre-release
     permissions:
       contents: write
     steps:
