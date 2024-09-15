@@ -36,4 +36,4 @@ jobs:
             ${{ runner.os }}-cargo-build-
 
       - name: Run Tests
-        run: cargo test
+        run: cargo test --color always
