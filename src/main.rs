@@ -81,7 +81,7 @@ fn create_patterns_filters(arg: &str) -> Vec<PatternFilter> {
         let pattern = if exclude {
             pattern[1..].to_string()
         } else {
-            pattern.to_string()
+            (*pattern).to_string()
         };
 
         patterns_filters.push(PatternFilter {
