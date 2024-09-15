@@ -40,7 +40,7 @@ jobs:
             ${{ runner.os }}-cargo-build-
 
       - name: Build
-        run: cargo build --release
+        run: cargo build --release --color always
 
       - name: Create Archive Folder
         run: mkdir ${{ runner.os }}
