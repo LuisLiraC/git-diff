@@ -85,6 +85,7 @@ fn get_changed_files() -> Vec<String> {
     let head = repository.head().expect("Failed to get HEAD");
     let head_commit = head.peel_to_commit().expect("Failed to peel HEAD to commit");
 
+    // Refers to base branch in case of pull request. For example: main
     let base_ref_env = env::var("GITHUB_BASE_REF").expect("Failed to get GITHUB_BASE_REF env variable");
 
     Command::new("sh")
