@@ -79,3 +79,5 @@ jobs:
           tag: ${{ steps.get_version.outputs.VERSION }}-prerelease
           allowUpdates: true
           makeLatest: false
+          prerelease: true
+          commit: ${{ github.sha }}
