@@ -51,4 +51,4 @@ jobs:
             ${{ runner.os }}-cargo-build-
 
       - name: Run Tests
-        run: cargo clippy --color always  -- -Dwarnings -W clippy::pedantic
+        run: make clippy
